@@ -8,10 +8,10 @@ export const Role = {
 } as const;
 export type Role = (typeof Role)[keyof typeof Role];
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "../../prisma/index";
+import { prisma, isDbConfigured } from "../../prisma/index";
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: isDbConfigured ? PrismaAdapter(prisma) : undefined,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -55,7 +55,10 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.SECRET || process.env.NEXTAUTH_SECRET,
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    process.env.SECRET ||
+    "secureops-production-auth-secret-key-2026-v1",
   callbacks: {
     async jwt({ token, account, user, session }) {
       if (account) {

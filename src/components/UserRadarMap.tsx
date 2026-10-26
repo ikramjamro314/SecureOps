@@ -236,10 +236,7 @@ export default function UserRadarMap() {
             <Popup>
               <div className="p-2 min-w-[210px] space-y-2">
                 <div className="flex items-center justify-between border-b pb-1">
-                  <div>
-                    <span className="font-bold text-gray-900 text-sm block">{g.name}</span>
-                    <span className="text-[10px] font-mono text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded">Guard ID: {g.badgeId || "GRD-101"}</span>
-                  </div>
+                  <span className="font-bold text-gray-900 text-sm">{g.name}</span>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
                     {g.verified ? "VERIFIED" : "PATROL"}
                   </span>
