@@ -7,19 +7,36 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useSession } from "next-auth/react";
 
-// WebSocket Connection
-const socket = io("ws://localhost:5000", {
-  transports: ["websocket"],
-});
+// WebSocket Connection (mock-safe)
+let socket: any = {
+  on: () => {},
+  off: () => {},
+  emit: () => {},
+};
 
-// Custom Marker Icon
-const customIcon = new L.Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-});
+if (typeof window !== "undefined") {
+  try {
+    socket = io("ws://localhost:5000", {
+      transports: ["websocket"],
+      reconnectionAttempts: 1,
+      timeout: 2000,
+    });
+  } catch (err) {
+    console.warn("Socket server unavailable, using client state fallback");
+  }
+}
+
+// Custom Marker Icon helper
+const getCustomIcon = () => {
+  if (typeof window === "undefined") return undefined as any;
+  return new L.Icon({
+    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+};
 
 // ChatBox Component
 const ChatBox = ({ guardId, userId }: { guardId: string; userId: string }) => {
@@ -27,7 +44,7 @@ const ChatBox = ({ guardId, userId }: { guardId: string; userId: string }) => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    socket.on(`${userId}-chat-${guardId}`, (msg) => {
+    socket.on(`${userId}-chat-${guardId}`, (msg: any) => {
       console.log("Received message:", msg);
       setMessages((prev) => [...prev, msg]);
     });
@@ -111,7 +128,7 @@ export default function LiveLocation() {
   }, [userId]);
 
   useEffect(() => {
-    socket.on("broadcastLocation", (data) => {
+    socket.on("broadcastLocation", (data: any) => {
       setUsers(data);
     });
 
@@ -131,13 +148,13 @@ export default function LiveLocation() {
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {location.lat !== null && location.lng !== null && (
-          <Marker position={[location.lat, location.lng]} icon={customIcon}>
+          <Marker position={[location.lat, location.lng]} icon={getCustomIcon()}>
             <Popup>You are here!</Popup>
           </Marker>
         )}
 
         {Object.entries(users).map(([id, user]) => (
-          <Marker key={id} position={[user.lat, user.lng]} icon={customIcon}>
+          <Marker key={id} position={[user.lat, user.lng]} icon={getCustomIcon()}>
             {id === userId ? (
               <Popup>You are here!</Popup>
             ) : (

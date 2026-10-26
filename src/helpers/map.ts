@@ -1,13 +1,9 @@
-// const geofence = {
-//   center: { lat: 22.780000, lng: 86.150000 },
-//   radius: 500,
-// };
-
-const geofence = {
-  center: { lat: 22.7765, lng: 86.1475 },
-  radius: 500,
+// Default fallback geofence duty base
+export const DEFAULT_GEOFENCE_BASE = {
+  lat: 22.7765,
+  lng: 86.1475,
+  radius: 500, // 500 meters
 };
-
 
 export const getDistance = (
   lat1: number,
@@ -29,40 +25,70 @@ export const getDistance = (
       Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-  return R * c;
+  return Math.round(R * c);
 };
 
-export const checkGeofence = (userLocation: { lat: number; lng: number }) => {
+export const checkGeofence = (
+  userLocation: { lat: number; lng: number },
+  baseLocation?: { lat: number; lng: number; radius?: number }
+) => {
+  const centerLat = baseLocation?.lat ?? DEFAULT_GEOFENCE_BASE.lat;
+  const centerLng = baseLocation?.lng ?? DEFAULT_GEOFENCE_BASE.lng;
+  const radius = baseLocation?.radius ?? DEFAULT_GEOFENCE_BASE.radius;
+
   const distance = getDistance(
     userLocation.lat,
     userLocation.lng,
-    geofence.center.lat,
-    geofence.center.lng
+    centerLat,
+    centerLng
   );
 
-  if (distance <= geofence.radius) {
-    return true;
-  } else {
-    return false;
-  }
+  return {
+    isInside: distance <= radius,
+    distanceMeters: distance,
+    radiusMeters: radius,
+  };
 };
 
-export const getUserLocation = (): Promise<{ lat: number; lng: number }> => {
+export interface RealGPSFix {
+  lat: number;
+  lng: number;
+  accuracy: number;
+  timestamp: number;
+}
+
+/**
+ * Instantly fetches real GPS coordinates from device hardware
+ * maximumAge: 0 forces the browser to query live hardware rather than cached location
+ */
+export const fetchInstantRealLocation = (): Promise<RealGPSFix> => {
   return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error("Geolocation is not supported by this browser."));
+    if (typeof window === "undefined" || !("geolocation" in navigator)) {
+      reject(new Error("Geolocation not supported by this device."));
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      (pos) => {
         resolve({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: Math.round(pos.coords.accuracy || 10),
+          timestamp: pos.timestamp || Date.now(),
         });
       },
-      (error) => reject(error),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      (err) => {
+        reject(err);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0, // Instant live hardware fix, no stale cache
+      }
     );
   });
+};
+
+export const getUserLocation = (): Promise<{ lat: number; lng: number }> => {
+  return fetchInstantRealLocation().then((fix) => ({ lat: fix.lat, lng: fix.lng }));
 };

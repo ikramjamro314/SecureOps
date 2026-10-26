@@ -1,23 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../prisma/index";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/libs/auth";
-import { Gender } from "@prisma/client";
+import { NextResponse } from "next/server";
+import { prisma, isDbConfigured } from "../../../../prisma/index";
+import { INITIAL_GUARDS } from "@/utils/mockStore";
 
 export async function GET() {
-  try {
-    const response = await prisma.user.findMany({
-      where: {
-        role: "GUARD",
-      },
-    });
+  if (isDbConfigured) {
+    try {
+      const dbGuards = await prisma.user.findMany({
+        where: {
+          role: "GUARD",
+        },
+      });
 
-    return NextResponse.json({
-      response,
-    });
-  } catch (error) {
-    return NextResponse.json({
-      error: "Something went wrong in finding the guard",
-    });
+      if (dbGuards && dbGuards.length > 0) {
+        return NextResponse.json({
+          response: dbGuards,
+        });
+      }
+    } catch (error) {
+      console.warn("DB query error in /api/guard:", error);
+    }
   }
+
+  return NextResponse.json({
+    response: INITIAL_GUARDS,
+  });
 }

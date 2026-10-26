@@ -44,5 +44,11 @@
     "prisma": "^6.3.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "@prisma/client@6.3.1": true,
+    "@prisma/engines@6.3.1": true,
+    "prisma@6.3.1": true,
+    "sharp@0.33.5": true
   }
 }

@@ -1,6 +1,12 @@
 import { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import { Role } from "@prisma/client";
+export const Role = {
+  GUARD: "GUARD",
+  AGENCY: "AGENCY",
+  POLICE: "POLICE",
+  USER: "USER",
+} as const;
+export type Role = (typeof Role)[keyof typeof Role];
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "../../prisma/index";
 
@@ -49,7 +55,7 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.SECRET,
+  secret: process.env.SECRET || process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, account, user, session }) {
       if (account) {

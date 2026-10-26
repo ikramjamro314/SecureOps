@@ -504,26 +504,18 @@ class App {
     font: string
   ) {
     const defaultItems = [
-     
-      
       {
-        image: `https://res.cloudinary.com/dwwbx27ts/image/upload/v1739603518/WhatsApp_Image_2025-02-15_at_12.40.35_3153bcad_dyscla.jpg`,
-        text: "Mohammad Ashab",
+        image: `/team/adeel.jpg`,
+        text: "Adeel Sehto",
       },
       {
-        image: `https://res.cloudinary.com/dwwbx27ts/image/upload/v1739603399/Screenshot_2025-02-15_123923_ni33ch.png`,
-        text: "Darshil Mahraur",
+        image: `/team/safiullah.jpg`,
+        text: "Safiullah Halepoto",
       },
       {
-        image: `https://res.cloudinary.com/dwwbx27ts/image/upload/v1739603583/WhatsApp_Image_2024-10-20_at_23.36.14_61819bac_zxvxv6.jpg`,
-        text: "Devansh Aryan",
+        image: `/team/mehtab.jpg`,
+        text: "Mehtab Ali",
       },
-      {
-        image: `https://res.cloudinary.com/dwwbx27ts/image/upload/v1739603746/Screenshot_2025-02-15_124523_zxjmts.png`,
-        text: "Hamad Hussain",
-      }
-      
-      
     ];
     const galleryItems = items && items.length ? items : defaultItems;
     this.mediasImages = galleryItems.concat(galleryItems);

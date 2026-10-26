@@ -10,13 +10,15 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
+import { INITIAL_GUARDS } from "@/utils/mockStore";
 
 const AttendancePage = () => {
   const { id } = useParams();
+  const matchedGuard = INITIAL_GUARDS.find((g) => g.id === id || g.badgeId === id) || INITIAL_GUARDS[0];
   const [guardData, setGuardData] = useState({
-    id: "G001",
-    name: "Rajesh Kumar",
-    shift: "Morning Shift (6 AM - 2 PM)",
+    id: matchedGuard.badgeId,
+    name: matchedGuard.name,
+    shift: `${matchedGuard.shift} Shift`,
   });
 
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -24,14 +26,6 @@ const AttendancePage = () => {
   const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState("");
-
-  // useEffect(() => {
-  //   setCurrentTime(format(new Date(), "HH:mm:ss"));
-  //   const interval = setInterval(() => {
-  //     setCurrentTime(format(new Date(), "HH:mm:ss"));
-  //   }, 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
 
   useEffect(() => {
     const fetchAttendanceData = async () => {
@@ -44,8 +38,7 @@ const AttendancePage = () => {
         if (!response.ok) throw new Error("Failed to fetch attendance data");
         const resData = await response.json();
 
-        setAttendanceHistory(resData.attendance);
-        console.log(resData);
+        setAttendanceHistory(Array.isArray(resData?.attendance) ? resData.attendance : []);
         setData(resData);
       } catch (error) {
         console.error("Error fetching attendance data:", error);
@@ -53,14 +46,17 @@ const AttendancePage = () => {
         setIsLoading(false);
       }
     };
-    fetchAttendanceData();
-  }, []);
+    if (id) {
+      fetchAttendanceData();
+    }
+  }, [id]);
 
   const handleCheckIn = async () => {
     setIsCheckedIn(true);
   };
 
-  console.log(attendanceHistory)
+  const displayName = data?.user?.name || matchedGuard.name;
+  const displayBadgeId = matchedGuard.badgeId;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 p-4 md:p-8">
@@ -86,9 +82,11 @@ const AttendancePage = () => {
                 <div>
                   <p className="text-sm text-gray-600">Guard Name</p>
                   <p className="font-semibold text-lg text-gray-800">
-                    {data?.user.name}
+                    {displayName}
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">{data?.user.id}</p>
+                  <p className="font-mono text-xs text-blue-700 font-bold bg-blue-50 w-fit px-2 py-0.5 rounded mt-1">
+                    Guard ID: {displayBadgeId}
+                  </p>
                 </div>
               </div>
             </div>

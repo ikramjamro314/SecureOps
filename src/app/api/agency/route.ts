@@ -1,23 +1,39 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/libs/auth";
 import { NextResponse } from "next/server";
+import { prisma, isDbConfigured } from "../../../../prisma/index";
+import { INITIAL_GUARDS } from "@/utils/mockStore";
 
 export async function GET() {
-  const sessions = await getServerSession(authOptions);
+  if (isDbConfigured) {
+    try {
+      const session = await getServerSession(authOptions);
+      const email = session?.user?.email;
 
-  const email = sessions?.user.email;
+      if (email) {
+        const agency = await prisma.agency.findFirst({
+          where: { email },
+          include: { users: true },
+        });
 
-  const agency = await prisma.agency.findFirst({
-    where: { email: email },
-    include: { users: true },
-  });
+        if (agency?.users && agency.users.length > 0) {
+          return NextResponse.json(agency.users);
+        }
+      }
 
-  if (!agency) {
-    return NextResponse.json({
-      message: "Error in finding agency",
-      status: 500,
-    });
+      // Try finding all users with GUARD role
+      const dbGuards = await prisma.user.findMany({
+        where: { role: "GUARD" },
+      });
+
+      if (dbGuards && dbGuards.length > 0) {
+        return NextResponse.json(dbGuards);
+      }
+    } catch (error) {
+      console.warn("DB query failed in /api/agency, using fallback guards:", error);
+    }
   }
-  console.log(agency.users);
-  return NextResponse.json(agency.users);
+
+  // Fallback to rich initial mock guards
+  return NextResponse.json(INITIAL_GUARDS);
 }

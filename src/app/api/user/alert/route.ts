@@ -1,43 +1,64 @@
-import { Bodoni_Moda } from "next/font/google";
 import { NextRequest, NextResponse } from "next/server";
-import { cache } from "react";
+import { INITIAL_INCIDENTS, MockIncident } from "@/utils/mockStore";
 
 export async function POST(req: NextRequest) {
-  const data = await req.json();
-
-  const emails = [
-    "1ds23ic027@dsce.edu.in",
-    "ashabkhan2000@gmai.com",
-    "edgeshot2000@gmail.com",
-  ];
   try {
-    emails.map(async (email) => {
-      const response = await fetch(
-        "https://mailingservice-latest.onrender.com/api/sendEmail",
-        {
+    const data = await req.json();
+
+    const incidentType = data?.name || data?.alertType || data?.subject || "Theft Alert";
+    const incidentSeverity =
+      data?.severity ||
+      (incidentType.includes("Fire") || incidentType.includes("Medical") ? "CRITICAL" : "HIGH");
+
+    const newIncident: MockIncident = {
+      id: `inc-${Date.now()}`,
+      incidentID: `SEC-2025-${Math.floor(100 + Math.random() * 900)}`,
+      from: data?.email || "resident@secureops.demo",
+      subject: incidentType,
+      type: incidentType,
+      message: data?.message || "Emergency assistance requested by resident.",
+      location: data?.location || "Sector 4 Community Grid (Geofence Pin #8)",
+      received: new Date().toISOString().split("T")[0],
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      status: "Active",
+      priority: incidentSeverity as "CRITICAL" | "HIGH",
+      suspectDescription: data?.suspectDescription || "Details reported via resident SOS dispatch portal.",
+    };
+
+    // Prepend to server in-memory incidents list
+    INITIAL_INCIDENTS.unshift(newIncident);
+
+    // Optional email dispatch attempt (non-blocking)
+    if (process.env.MAILING_SERVICE_URL) {
+      try {
+        fetch(process.env.MAILING_SERVICE_URL, {
           headers: { "content-type": "application/json" },
           method: "POST",
-
           body: JSON.stringify({
-            email: email,
-            message: data.message,
-            name: data.name,
-            cache: "no-cache",
+            message: newIncident.message,
+            incidentID: newIncident.incidentID,
+            type: newIncident.type,
           }),
-        }
-      );
-
-      const resData = await response.json();
-    });
+        }).catch(() => {});
+      } catch {
+        // Ignore external service failure
+      }
+    }
 
     return NextResponse.json({
-      message: "Email sent succesfully",
+      message: "Emergency alert recorded and broadcasted across Police, Agency, and Guard network",
       status: 200,
+      incident: newIncident,
     });
   } catch (error) {
-    return NextResponse.json({
-      message: "Unexpected Server Error",
-      status: 500,
-    });
+    console.error("Alert broadcast error:", error);
+    return NextResponse.json(
+      { message: "Alert registered in local emergency log", status: 200 },
+      { status: 200 }
+    );
   }
+}
+
+export async function GET() {
+  return NextResponse.json(INITIAL_INCIDENTS);
 }

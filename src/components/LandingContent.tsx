@@ -1,41 +1,113 @@
+"use client";
+
 import React from "react";
+import Link from "next/link";
+import { Shield, CheckCircle2, ArrowRight, Radio, Compass, Lock } from "lucide-react";
 
 const ServicesSection: React.FC = () => {
-    return (
-        <section className="py-14">
-            <div className="max-w-screen-xl mx-auto md:px-8">
-                <div className="items-center gap-x-12 sm:px-4 md:px-0 lg:flex">
-                    <div className="flex-1 sm:hidden lg:block">
-                        <img 
-                            src="https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80" 
-                            className="md:max-w-lg sm:rounded-lg" 
-                            alt="Professional Services" 
-                        />
-                    </div>
-                    <div className="max-w-xl px-4 space-y-3 mt-6 sm:px-0 md:mt-0 lg:max-w-2xl">
-
-                        <p className="text-gray-800 text-3xl font-semibold sm:text-4xl">
-                        Join the Mission: Revolutionizing Urban Security
-                        </p>
-                        <p className="mt-3 text-gray-600">
-                        Security should be proactive, not reactive. Our AI-driven platform eliminates inefficiencies, cuts costs by 30%, and improves response times by 40% with real-time tracking, automated attendance, and intelligent guard deployment. No more blind spots—just full transparency, accountability, and rapid incident response.
-
-We’re redefining urban security. Join us in building a smarter, safer future. 
-                        </p>
-                        <a 
-                            href="#" 
-                            className="inline-flex gap-x-1 items-center text-indigo-600 hover:text-indigo-500 duration-150 font-medium"
-                        >
-                            🔹 Are you in?
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-                                <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+  return (
+    <section className="py-20 bg-slate-900/40 text-white border-b border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Column: Tactical Features Visual */}
+          <div className="bg-slate-950 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span className="text-xs font-mono font-bold text-slate-300">Live Telemetric Protocol</span>
+              </div>
+              <span className="text-xs font-mono text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                ACTIVE
+              </span>
             </div>
-        </section>
-    );
+
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800/80 flex items-start gap-3">
+                <Compass className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-white">Sub-Meter Hardware GPS Accuracy</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Continuous watch position directly from device sensors, refreshing in real-time without stale caching.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800/80 flex items-start gap-3">
+                <Lock className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-white">500m Sector Geofence Perimeter</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Automated attendance verification: only guards physically inside their duty base can check in as Present.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900 border border-slate-800/80 flex items-start gap-3">
+                <Radio className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-white">Synchronized Emergency Broadcast</p>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Resident panic alerts instantly trigger notifications across Police dispatch terminals and guard radar maps.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center justify-between text-xs text-slate-400 font-mono">
+              <span>Status: Multi-Dashboard Sync</span>
+              <span className="text-blue-400 font-bold">100% Operational</span>
+            </div>
+          </div>
+
+          {/* Right Column: Mission & Call To Actions */}
+          <div className="space-y-6">
+            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+              Mission: Smart Urban Security
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Security Should Be Proactive, Verifiable, and Instant
+            </h2>
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
+              Our AI-driven platform eliminates inefficiencies, reduces response times by 40%, and provides total operational transparency. No more blind spots—just accountability, real GPS verification, and rapid crisis response.
+            </p>
+
+            <div className="space-y-3 pt-2 text-sm text-slate-300">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Zero manual logbooks — tamper-proof digital muster roll</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Direct integration with Local Police stations & PCR units</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Instant escort requests & live community radar tracking</span>
+              </div>
+            </div>
+
+            <div className="pt-4 flex flex-wrap gap-4">
+              <Link
+                href="/guard/dashboard"
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-xl shadow-blue-600/30 transition-all hover:scale-105"
+              >
+                <span>Launch Guard Terminal</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/feature"
+                className="px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 font-semibold text-xs flex items-center gap-2 transition-all"
+              >
+                <span>View Full Features</span>
+              </Link>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default ServicesSection;

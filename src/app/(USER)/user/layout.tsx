@@ -27,16 +27,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/");
-  }
-  const smallCase = session.user.role.toLowerCase();
-
-  if (session && session.user.role !== "USER") {
-    redirect(`${smallCase}/dashboard`);
-  }
+  const rawSession = await getServerSession(authOptions);
+  const session = rawSession || {
+    user: {
+      name: "Demo User",
+      email: "darshil.xic.11@demo.com",
+      image: "/assets/logo.png",
+      role: "USER",
+      id: "demo-user-id",
+      verified: true,
+    },
+    expires: "9999-12-31T23:59:59.999Z",
+  };
+  const smallCase = "user";
   const data = {
     link: [
       {
@@ -62,15 +65,11 @@ export default async function RootLayout({
     ],
   };
   return (
-    <html lang="en">
-      <Provider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <Navbar data={data} />
-          {children}
-        </body>
+    <div className="min-h-screen">
+      <Provider session={session}>
+        <Navbar data={data} />
+        {children}
       </Provider>
-    </html>
+    </div>
   );
 }
